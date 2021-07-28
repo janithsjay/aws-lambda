@@ -1,13 +1,27 @@
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import org.apache.log4j.Logger;
-public class Runner implements RequestHandler<String, String> {
+import com.amazonaws.services.lambda.runtime.events.SQSEvent;
+import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage;
 
-    public final static Logger LOGGER = Logger.getLogger(Runner.class);
+public class Runner implements RequestHandler<SQSEvent, Void> {
 
     @Override
-    public String handleRequest(String s, Context context) {
-        LOGGER.info("Lambda invoked..................");
+    public Void handleRequest(SQSEvent sqsEvent, Context context) {
+
+        final LambdaLogger logger=context.getLogger();
+        logger.log("Lambda invoked.......");
+        // log execution details
+        logger.log("ENVIRONMENT VARIABLES: " + System.getenv());
+        logger.log("CONTEXT: " + context);
+        // process event
+        logger.log("EVENT: " + sqsEvent);
+        logger.log("==================================================");
+
+        for(SQSMessage msg : sqsEvent.getRecords()){
+            logger.log(msg.getBody());
+        }
+
         return null;
     }
 }
